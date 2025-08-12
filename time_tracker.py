@@ -39,10 +39,9 @@ class hourTracker:
 
         self.fields = []
 
-        self.submit = tk.Button(
-            self.root, 
-            text='Submit', 
-            command=self.fill_csv)
+        self.add = tk.Button(self.form,text='+',command=self.add_prompt)
+
+        self.submit = tk.Button(self.root,text='Submit',command=self.fill_csv)
 
         self.out = []
 
@@ -73,52 +72,44 @@ class hourTracker:
                 field_row.append(field)
             self.fields.append(field_row)
         
+        self.add.grid(row=len(self.projects)+1,column=0)
+        
         self.submit.grid(row=1,column=0)
-        
-    #     for i, checkbox in enumerate(self.checkboxes):
-    #         checkbox.destroy()
-    #         self.row_frames[i].destroy()
-    #     if (self.submitHours.winfo_exists()):
-    #         self.submitHours.grid_forget()
 
-    #     self.checkboxes.clear()
-    #     self.checkboxes_checked.clear()
-    #     self.entries.clear()
-    #     self.row_frames.clear()
-    #     self.project_list.clear()
+    def add_prompt(self):
+        self.add.grid_forget()
 
-        
-    #     for i, project in enumerate(self.project_list):
-    #         checked = tk.IntVar()
-    #         self.checkboxes_checked.append(checked)
+        num_projects = len(self.projects)
 
-    #         checkbox = tk.Checkbutton(
-    #             self.root, 
-    #             text=project, 
-    #             variable=checked,
-    #             command=self.showInputField)
-    #         self.checkboxes.append(checkbox)
-    #         checkbox.grid(row=i+4, column=0, sticky='w')
+        self.enter_proj = tk.Entry(self.form,width=10)
+        self.enter_proj.grid(row=num_projects+1,column=0)
 
-    #         row_frame = tk.Frame(self.root)
-    #         self.row_frames.append(row_frame)
+        self.confirm = tk.Button(
+            self.form,
+            text='Confirm',
+            command=self.add_form_row)
+        self.confirm.grid(row=num_projects+1,column=1)
 
-    #         entry_row = []
-    #         for j in range(5):
-    #             entry = tk.Entry(row_frame, width = 10)
-    #             entry.grid(row=0, column=j)
-    #             entry_row.append(entry)
+    def add_form_row(self):
+        new_proj = self.enter_proj.get()
+        self.projects.append(new_proj)
+        num_projects = len(self.projects)
 
-    #         self.entries.append(entry_row)
+        label = tk.Label(self.form,text=new_proj)
+        label.grid(row=num_projects,column=0)
 
-    #     self.submitHours.grid(row=len(self.project_list)+4, column=0, sticky='w')
+        field_row = []
+        for j in range(1,6):
+            field = tk.Entry(self.form,width=10)
+            field.grid(row=num_projects,column=j)
+            field_row.append(field)
+        self.fields.append(field_row)
 
-    # def showInputField(self):
-    #     for i, row_frame in enumerate(self.row_frames):
-    #         if (self.checkboxes_checked[i].get()):
-    #             row_frame.grid(row=i+4, column=1, sticky='w')
-    #         else:
-    #             row_frame.grid_forget()
+        self.enter_proj.destroy()
+
+        self.confirm.destroy()
+
+        self.add.grid(row=num_projects+1,column=0)
 
     def fill_csv(self):
         self.out.append(['Projects'] + self.headers[1:] + ['Total'])
@@ -129,15 +120,13 @@ class hourTracker:
                 cell = field.get()
                 if (j != 4):
                     if (cell == ''):
-                        line.append(0.0)
-                    else:
-                        line.append(float(cell))
+                        cell = 0
+                    line.append(float(cell))
                     total += float(cell)
                 else:
                     if (cell == ''):
-                        line.append('N/A')
-                    else:
-                        line.append(cell)
+                        cell = 'n/a'
+                    line.append(cell)
 
                 field.delete(0, tk.END)
             line.append(total)
