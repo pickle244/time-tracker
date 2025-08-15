@@ -41,6 +41,13 @@ class hourTracker:
 
         self.add = tk.Button(self.form,text='+',command=self.add_prompt)
 
+        self.enter_proj = tk.Entry(self.form,width=10)
+
+        self.confirm_add = tk.Button(
+            self.form,
+            text='Confirm',
+            command=self.add_form_row)
+
         self.submit = tk.Button(self.root,text='Submit',command=self.fill_csv)
 
         self.out = []
@@ -81,14 +88,9 @@ class hourTracker:
 
         num_projects = len(self.projects)
 
-        self.enter_proj = tk.Entry(self.form,width=10)
         self.enter_proj.grid(row=num_projects+1,column=0)
 
-        self.confirm = tk.Button(
-            self.form,
-            text='Confirm',
-            command=self.add_form_row)
-        self.confirm.grid(row=num_projects+1,column=1)
+        self.confirm_add.grid(row=num_projects+1,column=1)
 
     def add_form_row(self):
         new_proj = self.enter_proj.get()
@@ -107,7 +109,7 @@ class hourTracker:
 
         self.enter_proj.destroy()
 
-        self.confirm.destroy()
+        self.confirm_add.destroy()
 
         self.add.grid(row=num_projects+1,column=0)
 
@@ -132,10 +134,10 @@ class hourTracker:
             line.append(total)
             self.out.append(line)
 
-        filePath = os.path.abspath(__file__)
-        dirPath = os.path.join(os.path.dirname(filePath), 'time_tracker.csv')
+        dir_path = os.path.dirname(os.getcwd())
+        file_path = os.path.join(dir_path, 'time_tracker.csv')
         try:
-            with open(dirPath, 'a', newline='') as csvfile:
+            with open(file_path, 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 date = datetime.datetime.now().strftime('%A, %B %d, %Y')
                 writer.writerow([date])
