@@ -11,6 +11,8 @@ class hourTracker:
         self.root.title('Hour Tracker')
         self.root.geometry('700x400')
 
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
         self.prompt = tk.Label(
             self.root, 
             text='List your projects today, separated by commas:')
@@ -20,12 +22,14 @@ class hourTracker:
 
         self.response = tk.Entry(self.root,width=50)
         self.response.grid(row=1,column=0)
+        self.response.focus_set()
 
         self.confirm = tk.Button(
             self.root, 
             text='Confirm', 
             command=self.build_form)
         self.confirm.grid(row=2,column=0)
+        self.root.bind('<Return>', lambda event: self.confirm.invoke())
 
         self.form = tk.Frame(self.root)
 
@@ -54,7 +58,7 @@ class hourTracker:
 
         self.root.mainloop()
 
-    def build_form(self):
+    def build_form(self, event=None):
         self.prompt.destroy()
         
         self.projects = [proj.strip() for proj in self.response.get().split(',')]
@@ -78,10 +82,13 @@ class hourTracker:
                 field.grid(row=i+1,column=j)
                 field_row.append(field)
             self.fields.append(field_row)
+
+        self.fields[0][0].focus_set()
         
         self.add.grid(row=len(self.projects)+1,column=0)
         
         self.submit.grid(row=1,column=0)
+        self.root.bind('<Return>', lambda event: self.submit.invoke())
 
     def add_prompt(self):
         self.add.grid_forget()
@@ -90,9 +97,12 @@ class hourTracker:
 
         self.enter_proj.grid(row=num_projects+1,column=0)
 
-        self.confirm_add.grid(row=num_projects+1,column=1)
+        self.enter_proj.focus_set()
 
-    def add_form_row(self):
+        self.confirm_add.grid(row=num_projects+1,column=1)
+        self.root.bind('<Return>', lambda event: self.confirm_add.invoke())
+
+    def add_form_row(self, event=None):
         new_proj = self.enter_proj.get()
         self.projects.append(new_proj)
         num_projects = len(self.projects)
@@ -106,6 +116,7 @@ class hourTracker:
             field.grid(row=num_projects,column=j)
             field_row.append(field)
         self.fields.append(field_row)
+        self.fields[len(self.fields) - 1][0].focus_set()
 
         self.enter_proj.destroy()
 
@@ -113,7 +124,9 @@ class hourTracker:
 
         self.add.grid(row=num_projects+1,column=0)
 
-    def fill_csv(self):
+        self.root.bind('<Return>', lambda event: self.submit.invoke())
+
+    def fill_csv(self, event=None):
         self.out.append(['Projects'] + self.headers[1:] + ['Total'])
         for i, field_row in enumerate(self.fields):
             line = [self.projects[i]]
@@ -148,5 +161,9 @@ class hourTracker:
         except:
             messagebox.showwarning('Warning', 'Error writing to file')
             self.out.clear()
+
+    def on_closing(self):
+        self.root.quit()
+        self.root.destroy()
 
 hourTracker()
